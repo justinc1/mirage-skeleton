@@ -34,3 +34,40 @@ CAMLprim value times2(value aa)
     int bb = times2_real(Int_val(aa));
     CAMLreturn(Val_int(bb));
 }
+
+void read_int_real(int aa)
+{
+#ifdef FOR_UNIX
+    fprintf(stderr, "aa=%d\n", aa);
+#endif
+    asm(""); // will prevent optimization?
+    aa =  aa*2;
+}
+
+CAMLprim value read_int(value aa)
+{
+    CAMLparam1(aa);
+    read_int_real(Int_val(aa));
+    CAMLreturn(Val_unit);
+}
+
+int return_int_real()
+{
+    int bb = 44;
+    return bb;
+}
+
+/* return_int() version 1 */
+CAMLprim value return_int(value unit) /* works in xen */
+{
+    CAMLparam0(); // to get caml__frame declared
+    int bb = return_int_real();
+    CAMLreturn(Val_int(bb));
+}
+
+/* return_int() version 2 */
+CAMLprim value return_int_v2(value unit) /* works in xen */
+{
+    int bb = return_int_real();
+    return Val_int(bb);
+}
